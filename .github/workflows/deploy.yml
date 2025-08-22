@@ -1,0 +1,37 @@
+name: Auto Deploy
+
+on:
+  push:
+    branches:
+      - main  # or master, depending on your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Runs on an Ubuntu machine
+
+    steps:
+      # Checkout code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js (Ensure you have the correct version of Node.js)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'  # Or your desired Node.js version
+
+      # Set up SSH (for secure connection to your server)
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Install pm2 globally (if needed)
+      - name: Install pm2 globally
+        run: |
+          npm install -g pm2
+
+      # Deploy to your server
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no root@167.71.224.42 'bash /var/www/teamwise-api/deploy.sh'
